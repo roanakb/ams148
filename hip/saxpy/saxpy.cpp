@@ -18,6 +18,14 @@ __global__ void saxpy(int n, float a, const float x[], float y[])
 	} 
 }
 
+void serial_saxpy(int n, float a, const float x[], float y[])
+{
+        for(std::size_t i = 0; i < n; ++i) {
+        	y[i] += a*x[i];
+		// std::cout<<"i is " << i<<std::endl; 
+        }
+}
+
 int main()
 {
 	int N = 256; 
@@ -28,7 +36,13 @@ int main()
 
 	//allocate and initializing memory on host
 	std::vector<float> x(N, 1.f);
-	std::vector<float> y(N, 1.f);
+	std::vector<float> y1(N, 1.f);
+	//float y2[N] = { 1.f };
+
+	float y2[N];
+	std::fill_n (y2, N, 1.f);
+
+	// y2 = float[N]; //C++
 /*
 	float *x, *y; 
 	x = new float[N]; //C++
@@ -40,15 +54,15 @@ int main()
 	
 	//Memory Transfer! 
 	hipMemcpy(d_x, x.data(), N*sizeof(float), hipMemcpyHostToDevice);
-	hipMemcpy(d_y, y.data(), N*sizeof(float), hipMemcpyHostToDevice); 
+	hipMemcpy(d_y, y1.data(), N*sizeof(float), hipMemcpyHostToDevice); 
 
 	// Use HIP Events for timing
 
-    hipEvent_t start, stop; 
-    float time; 
-    hipEventCreate(&start); 
-    hipEventCreate(&stop); 
-    hipEventRecord(start, 0); 
+        hipEvent_t start, stop; 
+        float time; 
+        hipEventCreate(&start); 
+        hipEventCreate(&stop); 
+        hipEventRecord(start, 0); 
 
 
 	//Launch the Kernel! In this configuration there is 1 block with 256 threads
@@ -56,17 +70,20 @@ int main()
 	saxpy<<<1, 256>>>(N, a, d_x, d_y);
 
 
-    hipEventRecord(stop, 0); 
-    hipEventSynchronize(stop); 
-    hipEventElapsedTime(&time, start, stop); 
-    std::cout<< " Shared Memory Matrix Multiplication time =" << '\t' 
+        hipEventRecord(stop, 0); 
+        hipEventSynchronize(stop); 
+        hipEventElapsedTime(&time, start, stop); 
+        std::cout<< " Shared Memory Matrix Multiplication time =" << '\t' 
              << time << "ms" << std::endl; 
 
 	//Transfering Memory back! 
-	hipMemcpy(y.data(), d_y, N*sizeof(float), hipMemcpyDeviceToHost);
-	std::cout<<"First Element of z = ax + y is " << y[0]<<std::endl; 
+	hipMemcpy(y1.data(), d_y, N*sizeof(float), hipMemcpyDeviceToHost);
+	std::cout<<"First Element of z = ax + y is " << y1[0]<<std::endl; 
 	hipFree(d_x);
 	hipFree(d_y);
+
+	serial_saxpy(N, a, x.data(), y2);
+	std::cout<<"SERIAL First Element of z = ax + y is " << y2[0]<<std::endl; 
 	std::cout<<"Done!"<<std::endl;  
 	return 0;
 }
