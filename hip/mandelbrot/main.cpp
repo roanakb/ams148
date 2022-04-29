@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <hip/hip_runtime.h> 
+#include <iostream>
 
 #include "CImg.h"
 
@@ -70,8 +71,21 @@ void mandelbrot(const int width, const int height, const int max_iter)
 
   /* dim3  int x, int y, int z */
 
+  hipEvent_t start, stop;
+  float time;
+  hipEventCreate(&start);
+  hipEventCreate(&stop);
+  hipEventRecord(start, 0);
+
   /*kernel<< grid_Dim, block_Dim, #bytes_shared_mem>>> */ 
   render<<< grid_Dim, block_Dim >>>(image, width, height, max_iter);
+
+  hipEventRecord(stop, 0);
+  hipEventSynchronize(stop);
+  hipEventElapsedTime(&time, start, stop);
+  std::cout<< " GPU Mandelbrot for width " << width << " and height " << height << " time =" << '\t'
+	   << time << "ms" << std::endl;
+
 
   /*after render is done */ 
   hipMemcpy(host_image, image, buffer_size, hipMemcpyDeviceToHost);
@@ -88,6 +102,10 @@ void mandelbrot(const int width, const int height, const int max_iter)
 /*main function */ 
 int main() 
 {
-  mandelbrot(7680, 7680, 256);
+  int N[] = {1024, 2048, 4096, 8192};
+  for(int i = 0; i < 4; ++i) {
+    mandelbrot(N[i], N[i], 256);
+  }
+  // mandelbrot(1024, 1024, 256);
   return 0;
 }
