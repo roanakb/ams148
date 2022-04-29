@@ -42,9 +42,25 @@ int main()
 	hipMemcpy(d_x, x.data(), N*sizeof(float), hipMemcpyHostToDevice);
 	hipMemcpy(d_y, y.data(), N*sizeof(float), hipMemcpyHostToDevice); 
 
+	// Use HIP Events for timing
+
+    hipEvent_t start, stop; 
+    float time; 
+    hipEventCreate(&start); 
+    hipEventCreate(&stop); 
+    hipEventRecord(start, 0); 
+
+
 	//Launch the Kernel! In this configuration there is 1 block with 256 threads
 	//Use gridDim = int((N-1)/256) in general  
 	saxpy<<<1, 256>>>(N, a, d_x, d_y);
+
+
+    hipEventRecord(stop, 0); 
+    hipEventSynchronize(stop); 
+    hipEventElapsedTime(&time, start, stop); 
+    std::cout<< " Shared Memory Matrix Multiplication time =" << '\t' 
+             << time << "ms" << std::endl; 
 
 	//Transfering Memory back! 
 	hipMemcpy(y.data(), d_y, N*sizeof(float), hipMemcpyDeviceToHost);
