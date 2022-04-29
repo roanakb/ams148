@@ -28,9 +28,8 @@ void serial_saxpy(int n, float a, const float x[], float y[])
         }
 }
 
-int main()
+int time_gpu_saxpy(int N)
 {
-	int N = 65536; 
 	//create pointers and device
 	float *d_x, *d_y; 
 	
@@ -76,21 +75,20 @@ int main()
         hipEventRecord(stop, 0); 
         hipEventSynchronize(stop); 
         hipEventElapsedTime(&time, start, stop); 
-        std::cout<< " GPU Saxpy time =" << '\t'  << time << "ms" << std::endl; 
-
+	std::cout<< " GPU Saxpy time for n = " << n << " is" << '\t' << serial << "ms" << std::endl; 
 	//Transfering Memory back! 
 	hipMemcpy(y1.data(), d_y, N*sizeof(float), hipMemcpyDeviceToHost);
 	std::cout<<"First Element of z = ax + y is " << y1[0]<<std::endl; 
 	hipFree(d_x);
 	hipFree(d_y);
+}
 
-	clock_t sstart = clock();	// Serial Start
-	serial_saxpy(N, a, x.data(), y2);
-	sleep(10);
-	clock_t send = clock();		// Serial End
-	float serial = float(send - sstart);
-        std::cout<< " Serial Saxpy time =" << '\t' << serial << "ms" << std::endl; 
-
+int main()
+{
+	int N[] = {16, 128, 1024, 2048, 65536}; 
+	for(int i = 0; i < 5; ++i) {
+        time_gpu_saxpy(N[i]);
+    }
 	std::cout<<"Done!"<<std::endl;  
 	return 0;
 }

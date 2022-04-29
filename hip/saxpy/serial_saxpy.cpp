@@ -14,7 +14,7 @@ void serial_saxpy(int n, float a, const float x[], float y[])
         }
 }
 
-void time_saxpy(int n)
+void time_serial_saxpy(int n)
 {
     //create pointers and device
 	float *d_x, *d_y; 
@@ -42,7 +42,7 @@ int main()
 
 	int N[] = {16, 128, 1024, 2048, 65536}; 
 	for(int i = 0; i < 5; ++i) {
-        time_saxpy(N[i]);
+        time_serial_saxpy(N[i]);
     }
 
 	std::cout<<"Done!"<<std::endl;  
