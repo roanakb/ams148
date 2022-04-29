@@ -3,6 +3,8 @@
 #include <vector>
 #include <iostream>
 #include <hip/hip_runtime.h>
+#include <ctime>
+#include <unistd.h>
 
 /* this is the vector addition kernel. 
    :inputs: n -> Size of vector, integer
@@ -28,7 +30,7 @@ void serial_saxpy(int n, float a, const float x[], float y[])
 
 int main()
 {
-	int N = 256; 
+	int N = 65536; 
 	//create pointers and device
 	float *d_x, *d_y; 
 	
@@ -67,14 +69,14 @@ int main()
 
 	//Launch the Kernel! In this configuration there is 1 block with 256 threads
 	//Use gridDim = int((N-1)/256) in general  
-	saxpy<<<1, 256>>>(N, a, d_x, d_y);
+	int gridDim = int(N/1024);
+	saxpy<<<gridDim, 1024>>>(N, a, d_x, d_y);
 
 
         hipEventRecord(stop, 0); 
         hipEventSynchronize(stop); 
         hipEventElapsedTime(&time, start, stop); 
-        std::cout<< " Shared Memory Matrix Multiplication time =" << '\t' 
-             << time << "ms" << std::endl; 
+        std::cout<< " GPU Saxpy time =" << '\t'  << time << "ms" << std::endl; 
 
 	//Transfering Memory back! 
 	hipMemcpy(y1.data(), d_y, N*sizeof(float), hipMemcpyDeviceToHost);
@@ -82,8 +84,13 @@ int main()
 	hipFree(d_x);
 	hipFree(d_y);
 
+	clock_t sstart = clock();	// Serial Start
 	serial_saxpy(N, a, x.data(), y2);
-	std::cout<<"SERIAL First Element of z = ax + y is " << y2[0]<<std::endl; 
+	sleep(10);
+	clock_t send = clock();		// Serial End
+	float serial = float(send - sstart);
+        std::cout<< " Serial Saxpy time =" << '\t' << serial << "ms" << std::endl; 
+
 	std::cout<<"Done!"<<std::endl;  
 	return 0;
 }
