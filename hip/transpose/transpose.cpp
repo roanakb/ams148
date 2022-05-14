@@ -53,7 +53,8 @@ void Transpose(const Matrix A, Matrix B)
     hipEventRecord(stop, 0); 
     hipEventSynchronize(stop); 
     hipEventElapsedTime(&time, start, stop); 
-    std::cout<< " Shared Memory Matrix Multiplication time =" << '\t' 
+    std::cout<< " Shared Memory Matrix-Vector Multiplication time for N = " 
+             << A.width << " is " << '\t' 
              << time << "ms" << std::endl; 
 
 	// Read B from Device memory 
