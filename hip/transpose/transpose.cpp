@@ -62,7 +62,7 @@ void NaiveTranspose(const Matrix A, Matrix B)
     hipEventSynchronize(stop); 
     hipEventElapsedTime(&elapsed_secs, start, stop); 
     std::cout<< " Naive Matrix Transpose Multiplication time for N = " 
-             << N << " is " << '\t' 
+             << A.width << " is " << '\t' 
              << time << "ms" << std::endl;     // Read B from device memory 
     B.load(d_B, fromDev); 
     // Free device memory 
@@ -71,7 +71,7 @@ void NaiveTranspose(const Matrix A, Matrix B)
 }
 
 //Main program 
-int time_transpose(int N)
+void time_transpose(int N)
 {
 // Set up matrices
     int Cpu = 0;
