@@ -68,7 +68,7 @@ void Transpose(const Matrix A, Matrix B)
 
 
 // Matrix TransposeKernel
-__global__ void TranposeKernel(Matrix A, Matrix B)
+__global__ void TransposeKernel(Matrix A, Matrix B)
 {
 	//Static shared memory for Asub and Bsub
 	__shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
