@@ -1,10 +1,12 @@
 /* Matrix vector product for GPU
    Roanak Baviskar */
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
 #include <iostream>
 #include <hip/hip_runtime.h>
-#include <stdio.h>
 #include <ctime>
+#include <unistd.h>
 
 /* Use Matrix Class! */
 #include "mat.h"
@@ -44,12 +46,24 @@ void MatVec(const Matrix A, const float B[], float C[])
    dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
    dim3 dimGrid(A.width / dimBlock.x, A.height/ dimBlock.y);
 
+   //Use HIP Events for timing
+    hipEvent_t start, stop; 
+    float time; 
+    hipEventCreate(&start); 
+    hipEventCreate(&stop); 
+    hipEventRecord(start, 0); 
+
    MatVecKernel<<<dimGrid, dimBlock>>>(d_A, d_B, d_C);
 
+
+    hipEventRecord(stop, 0); 
+    hipEventSynchronize(stop); 
+    hipEventElapsedTime(&time, start, stop); 
+    std::cout<< " Shared Memory Matrix-Vector Multiplication time =" << '\t' 
+             << time << "ms" << std::endl; 
+
+
    hipMemcpy(C, d_C, N*sizeof(float), hipMemcpyDeviceToHost);
-
-
-
 
 
    //Free device memory 
