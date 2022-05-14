@@ -59,7 +59,8 @@ void MatVec(const Matrix A, const float B[], float C[])
     hipEventRecord(stop, 0); 
     hipEventSynchronize(stop); 
     hipEventElapsedTime(&time, start, stop); 
-    std::cout<< " Shared Memory Matrix-Vector Multiplication time =" << '\t' 
+    std::cout<< " Shared Memory Matrix-Vector Multiplication time for N = " 
+             << N << " is " << '\t' 
              << time << "ms" << std::endl; 
 
 
