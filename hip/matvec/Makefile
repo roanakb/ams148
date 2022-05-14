@@ -1,16 +1,16 @@
 C = hipcc
 CFLAGS = -std=c++11
 
-all: matmul 
+all: matvec 
 
-matmul: matmul.o mat.o 
-	$(C) $(CFLAGS) -o matmul.exe matmul.o mat.o 
-matmul.o: matmul.cpp
-	$(C) $(CFLAGS) -c matmul.cpp -o matmul.o
+matvec: matvec.o mat.o 
+	$(C) $(CFLAGS) -o matvec.exe matvec.o mat.o 
+matvec.o: matvec.cpp
+	$(C) $(CFLAGS) -c matvec.cpp -o matvec.o
 mat.o: mat.cpp
 	$(C) $(CFLAGS) -c mat.cpp -o mat.o
 
 clean:
-	rm -f matmul.exe *.dat *.o
+	rm -f matvec.exe *.dat *.o
 
 

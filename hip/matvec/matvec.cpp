@@ -4,7 +4,7 @@
 #include <iostream>
 #include <hip/hip_runtime.h>
 #include <stdio.h>
-#include <ctime.h>
+#include <ctime>
 
 /* Use Matrix Class! */
 #include "mat.h"
