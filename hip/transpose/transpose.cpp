@@ -61,8 +61,9 @@ void NaiveTranspose(const Matrix A, Matrix B)
     hipEventRecord(stop, 0); 
     hipEventSynchronize(stop); 
     hipEventElapsedTime(&elapsed_secs, start, stop); 
-    std::cout<<" Naive GPU MatMul Time = "<< elapsed_secs << "ms" << std::endl;
-    // Read B from device memory 
+    std::cout<< " Naive Matrix Transpose Multiplication time for N = " 
+             << N << " is " << '\t' 
+             << time << "ms" << std::endl;     // Read B from device memory 
     B.load(d_B, fromDev); 
     // Free device memory 
     d_A.dealloc(Gpu);
@@ -70,12 +71,11 @@ void NaiveTranspose(const Matrix A, Matrix B)
 }
 
 //Main program 
-int main()
+int time_transpose(int N)
 {
 // Set up matrices
     int Cpu = 0;
-    int N = 1024;
-    int M = 1024;
+    int M = N;
 
     Matrix A(N, M, N, Cpu), B(M, N, M, Cpu), C(N, N, N, Cpu);
     Matrix Ds(N, M, N, Cpu), D(N,M,N, Cpu);
@@ -114,4 +114,14 @@ int main()
     Ds.dealloc();
     D.dealloc();
     nC.dealloc(); 
+}
+
+int main()
+{
+   int N[] = {16, 128, 1024, 2048, 65536}; 
+	for(int i = 0; i < 5; ++i) {
+        time_transpose(N[i]);
+    }
+	std::cout<<"Done!"<<std::endl;  
+	return 0;
 }
