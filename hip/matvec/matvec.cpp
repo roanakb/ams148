@@ -15,7 +15,7 @@
 
 
 // Forward declaration of the mat mul kernel
-__global__ void MatVecKernel(const Matrix, const float[], float[]); 
+__global__ void MatVecKernel(Matrix, float[], float[]); 
 
 /* Matrix vector multiplication
    :inputs: Matrix A, Float Array B
@@ -25,7 +25,8 @@ void MatVec(const Matrix A, const float B[], float C[])
 {
    float *d_B, *d_C;
    int Gpu = 1; 
-   int toDev = 1, fromDev = 2; 
+   int toDev = 1;
+   int N = A.width; 
    //Load A and B to device memory 
    //Allocate Matrix C
    Matrix d_A(A.width, A.height, A.stride, Gpu);
@@ -65,9 +66,8 @@ __global__ void MatVecKernel(Matrix A, float B[], float C[])
    __shared__ float Bs[BLOCK_SIZE]; // We will need a Blocksize chunk of B
 
    
-   // Block row and column;
+   // Block row;
 	int blockRow = blockIdx.y;
-	int blockCol = blockIdx.x;
 
    // Each thread computes one element of Csub
 	// By accumulating results into Cvalue
@@ -109,15 +109,15 @@ __global__ void MatVecKernel(Matrix A, float B[], float C[])
 
 void serialMatVec(const Matrix A, const float B[], float C[])
 {
-	for(int i = 0; i < A.width; i++)
+   for(int i = 0; i < A.width; i++)
    {
-      float Cvalue = 0.0f;
-		for(int j = 0; j < B.height; j++)
-		{
-			Cvalue += A.elements[i*A.width + j]*B[j];
-		}
-      C[i] = Cvalue;
+	float Cvalue = 0.0f;
+	for(int j = 0; j < A.width; j++)
+	{
+		Cvalue += A.elements[i*A.width + j]*B[j];
 	}
+	C[i] = Cvalue;
+   }
 }
 
 
