@@ -91,7 +91,7 @@ __global__ void TranposeKernel(Matrix A, Matrix B)
       bcol = blockRow;
    }
 	//Thread block computes one sub matrix Csub of C
-	subMatrix Csub(C, BLOCK_SIZE,  brow, bcol);
+	subMatrix Bsub(B, BLOCK_SIZE,  brow, bcol);
 
 	// Each thread computes one element of Csub
 	// By accumulating results into Cvalue
@@ -117,14 +117,14 @@ __global__ void TranposeKernel(Matrix A, Matrix B)
 		__syncthreads();
 
 		//Set Cvalue to correct value
-      Cvalue = As[row][col]
+      Cvalue = As[row][col];
 
 		//synchronize to make sure all threads are done computing
 		__syncthreads();
 	}
 	//write Csub back into global memory 
 	//each thread writes one element
-	Csub.SetElem(col, row, Cvalue);
+	Bsub.SetElem(col, row, Cvalue);
 }
 
 
