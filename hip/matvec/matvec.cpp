@@ -140,7 +140,7 @@ int main()
 {
    // Set up matrices
    int Cpu = 0;
-   int N = 1024;
+   int N = 65536;
 
    Matrix A(N, N, N, Cpu);
    float B[N];
