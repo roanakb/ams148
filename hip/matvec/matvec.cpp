@@ -135,12 +135,10 @@ void serialMatVec(const Matrix A, const float B[], float C[])
 }
 
 
-//Main program 
-int main()
+void runMatVec(int N)
 {
    // Set up matrices
    int Cpu = 0;
-   int N = 65536;
 
    Matrix A(N, N, N, Cpu);
    float B[N];
@@ -157,5 +155,15 @@ int main()
 
    A.dealloc();
 
+}
 
+//Main program 
+int main()
+{
+   int N[] = {16, 128, 1024, 2048}; 
+	for(int i = 0; i < 5; ++i) {
+        runMatVec(N[i]);
+    }
+	std::cout<<"Done!"<<std::endl;  
+	return 0;
 }
